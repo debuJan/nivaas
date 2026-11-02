@@ -14,7 +14,9 @@ export const SESSION_COOKIE = "nivaas_session";
 // DEV ONLY — replace via SESSION_SECRET in any real deployment.
 const DEV_SECRET = "dev-only-secret-do-not-use-in-production";
 const secret = new TextEncoder().encode(
-  process.env.SESSION_SECRET ?? DEV_SECRET,
+  // An empty SESSION_SECRET (e.g. copied blank from .env.example) must
+  // also fall back — a zero-length key makes WebCrypto throw DataError.
+  process.env.SESSION_SECRET?.trim() || DEV_SECRET,
 );
 
 export interface Session {
