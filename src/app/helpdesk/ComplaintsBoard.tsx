@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { formatDate, ageLabel } from "@/lib/format";
-import { ComplaintStatusChip, UrgencyLabel } from "@/components/chips";
+import { ComplaintStatusChip, UrgencyChip } from "@/components/chips";
 
 interface Complaint {
   id: string;
@@ -30,7 +30,7 @@ const TEAMS = [
 ];
 
 const selectCls =
-  "rounded-lg border border-stone-200 bg-white px-2 py-1 text-xs outline-none focus:border-accent";
+  "rounded-lg border border-stone-200 bg-white px-2 py-1.5 text-xs outline-none focus:border-accent";
 
 export function ComplaintsBoard() {
   const [complaints, setComplaints] = useState<Complaint[] | null>(null);
@@ -96,7 +96,7 @@ export function ComplaintsBoard() {
     <div className="overflow-x-auto rounded-2xl bg-white ring-1 ring-stone-200">
       <table className="w-full min-w-[880px] text-left text-sm">
         <thead>
-          <tr className="border-b border-stone-100 text-xs uppercase tracking-wide text-stone-400">
+          <tr className="border-b border-stone-200 bg-stone-50 text-xs uppercase tracking-wide text-stone-500">
             <th className="px-4 py-3 font-medium">Complaint</th>
             <th className="px-4 py-3 font-medium">Flat</th>
             <th className="px-4 py-3 font-medium">Age</th>
@@ -110,7 +110,11 @@ export function ComplaintsBoard() {
           {complaints.map((c) => (
             <tr
               key={c.id}
-              className={c.urgency === "CRITICAL" ? "bg-rose-50/70" : ""}
+              className={`align-top transition ${
+                c.urgency === "CRITICAL"
+                  ? "bg-rose-50/70"
+                  : "hover:bg-stone-50"
+              }`}
             >
               <td className="max-w-xs px-4 py-3">
                 <p className="font-medium">{c.title}</p>
@@ -136,7 +140,7 @@ export function ComplaintsBoard() {
                 {ageLabel(c.createdAt)}
               </td>
               <td className="whitespace-nowrap px-4 py-3">
-                <UrgencyLabel urgency={c.urgency} />
+                <UrgencyChip urgency={c.urgency} />
               </td>
               <td className="px-4 py-3">
                 <select

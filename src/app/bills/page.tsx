@@ -28,6 +28,12 @@ export default async function BillsPage() {
       session={session}
       flatLabel={memberships.map((m) => m.flat.code).join(" · ")}
     >
+      {memberships.length === 0 ? (
+        <p className="rounded-2xl bg-white p-5 text-sm text-stone-500 ring-1 ring-stone-200">
+          No flat is linked to your account yet. Please ask the help desk to
+          add your flat — your bills will appear here as soon as it is linked.
+        </p>
+      ) : (
       <div className="space-y-8">
         {memberships.map((m) => {
           const totalDue = m.flat.bills.reduce(
@@ -128,6 +134,7 @@ export default async function BillsPage() {
           );
         })}
       </div>
+      )}
     </ResidentShell>
   );
 }

@@ -3,7 +3,7 @@ import { prisma } from "@/lib/db";
 import { requirePageSession } from "@/lib/session";
 import { formatINR, formatMonth } from "@/lib/format";
 import { ResidentShell } from "@/components/ResidentShell";
-import { ComplaintStatusChip, UrgencyLabel } from "@/components/chips";
+import { ComplaintStatusChip, UrgencyChip } from "@/components/chips";
 
 export default async function HomePage() {
   const session = await requirePageSession("RESIDENT");
@@ -70,7 +70,7 @@ export default async function HomePage() {
               </ul>
               <Link
                 href="/bills"
-                className="mt-4 inline-block rounded-xl bg-accent px-5 py-2.5 font-medium text-white transition hover:bg-accent-dark"
+                className="mt-4 inline-block rounded-xl bg-accent px-5 py-3 font-medium text-white transition hover:bg-accent-dark"
               >
                 Pay now
               </Link>
@@ -85,7 +85,7 @@ export default async function HomePage() {
         <section>
           <div className="mb-2 flex items-center justify-between">
             <h2 className="font-semibold">Open complaints</h2>
-            <Link href="/complaints/new" className="text-sm font-medium text-accent">
+            <Link href="/complaints/new" className="inline-flex min-h-11 items-center text-sm font-medium text-accent">
               + Raise one
             </Link>
           </div>
@@ -112,7 +112,7 @@ export default async function HomePage() {
                       </div>
                       <div className="flex shrink-0 flex-col items-end gap-1">
                         <ComplaintStatusChip status={c.status} />
-                        <UrgencyLabel urgency={c.urgency} />
+                        <UrgencyChip urgency={c.urgency} />
                       </div>
                     </div>
                   </Link>
@@ -124,14 +124,20 @@ export default async function HomePage() {
 
         <section>
           <h2 className="mb-2 font-semibold">Notices</h2>
-          <ul className="space-y-2">
-            {notices.map((n) => (
-              <li key={n.id} className="rounded-2xl bg-white p-4 ring-1 ring-stone-200">
-                <p className="font-medium">{n.title}</p>
-                <p className="mt-1 text-sm text-stone-600">{n.body}</p>
-              </li>
-            ))}
-          </ul>
+          {notices.length === 0 ? (
+            <p className="rounded-2xl bg-white p-4 text-sm text-stone-500 ring-1 ring-stone-200">
+              No notices right now.
+            </p>
+          ) : (
+            <ul className="space-y-2">
+              {notices.map((n) => (
+                <li key={n.id} className="rounded-2xl bg-white p-4 ring-1 ring-stone-200">
+                  <p className="font-medium">{n.title}</p>
+                  <p className="mt-1 text-sm text-stone-600">{n.body}</p>
+                </li>
+              ))}
+            </ul>
+          )}
         </section>
       </div>
     </ResidentShell>

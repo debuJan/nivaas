@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { formatINR } from "@/lib/format";
+import { PaymentStatusChip } from "@/components/chips";
 
 interface VerdictRow {
   date?: string;
@@ -114,7 +115,7 @@ export function MatchingPanel() {
           accounts queue below — never on a flat by guesswork.
         </p>
         <div className="mt-3 flex flex-wrap items-center gap-2">
-          <label className="cursor-pointer rounded-lg bg-teal-50 px-3 py-2 text-sm font-medium text-accent ring-1 ring-teal-200 hover:bg-teal-100">
+          <label className="cursor-pointer rounded-lg bg-teal-50 px-3 py-2.5 text-sm font-medium text-accent ring-1 ring-teal-200 hover:bg-teal-100">
             Choose CSV file
             <input
               type="file"
@@ -129,7 +130,7 @@ export function MatchingPanel() {
           <button
             type="button"
             onClick={() => void useSample()}
-            className="rounded-lg bg-white px-3 py-2 text-sm font-medium text-stone-600 ring-1 ring-stone-200 hover:bg-stone-50"
+            className="rounded-lg bg-white px-3 py-2.5 text-sm font-medium text-stone-600 ring-1 ring-stone-200 hover:bg-stone-50"
           >
             Use sample CSV
           </button>
@@ -137,7 +138,7 @@ export function MatchingPanel() {
             type="button"
             disabled={running || !csv.trim()}
             onClick={() => void run()}
-            className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent-dark disabled:opacity-50"
+            className="rounded-lg bg-accent px-4 py-2.5 text-sm font-medium text-white hover:bg-accent-dark disabled:opacity-50"
           >
             {running ? "Matching…" : "Run matching"}
           </button>
@@ -179,17 +180,13 @@ export function MatchingPanel() {
                       {v.row.amount != null ? formatINR(v.row.amount) : "—"}
                     </td>
                     <td className="whitespace-nowrap py-2 pr-3">
-                      <span
-                        className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ring-1 ${
-                          v.verdict === "POSTED"
-                            ? "bg-teal-50 text-teal-700 ring-teal-200"
-                            : "bg-amber-50 text-amber-700 ring-amber-200"
-                        }`}
-                      >
-                        {v.verdict}
-                        {v.flatCode ? ` → ${v.flatCode}` : ""}
-                        {v.partial ? " (part)" : ""}
-                      </span>
+                      <PaymentStatusChip status={v.verdict} />
+                      {(v.flatCode || v.partial) && (
+                        <span className="ml-1.5 text-xs text-stone-500">
+                          {v.flatCode ? `→ ${v.flatCode}` : ""}
+                          {v.partial ? " (part payment)" : ""}
+                        </span>
+                      )}
                     </td>
                     <td className="py-2 text-stone-500">
                       <span className="text-xs text-stone-400">Tier {v.tier} · </span>
@@ -231,7 +228,7 @@ export function MatchingPanel() {
                   onChange={(e) =>
                     setChosen((prev) => ({ ...prev, [q.id]: e.target.value }))
                   }
-                  className="rounded-lg border border-stone-200 bg-white px-2 py-2 text-sm outline-none focus:border-accent"
+                  className="rounded-lg border border-stone-200 bg-white px-2 py-2.5 text-sm outline-none focus:border-accent"
                   aria-label="Post to flat"
                 >
                   {flats.map((f) => (
@@ -243,14 +240,14 @@ export function MatchingPanel() {
                 <button
                   type="button"
                   onClick={() => void resolve(q.id, "POST_TO_FLAT")}
-                  className="rounded-lg bg-accent px-3 py-2 text-sm font-medium text-white hover:bg-accent-dark"
+                  className="rounded-lg bg-accent px-3 py-2.5 text-sm font-medium text-white hover:bg-accent-dark"
                 >
                   Post to flat
                 </button>
                 <button
                   type="button"
                   onClick={() => void resolve(q.id, "REJECT")}
-                  className="rounded-lg px-3 py-2 text-sm font-medium text-stone-500 ring-1 ring-stone-200 hover:bg-stone-50"
+                  className="rounded-lg px-3 py-2.5 text-sm font-medium text-stone-500 ring-1 ring-stone-200 hover:bg-stone-50"
                 >
                   Reject
                 </button>

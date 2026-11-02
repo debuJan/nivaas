@@ -90,7 +90,7 @@ export function ComplaintForm({ flats }: { flats: Flat[] }) {
         )}
         <Link
           href="/complaints"
-          className="mt-5 inline-block rounded-xl bg-accent px-5 py-2.5 font-medium text-white hover:bg-accent-dark"
+          className="mt-5 inline-flex min-h-11 items-center rounded-xl bg-accent px-5 py-3 font-medium text-white hover:bg-accent-dark"
         >
           Track my complaints
         </Link>
@@ -153,7 +153,7 @@ export function ComplaintForm({ flats }: { flats: Flat[] }) {
       <button
         type="submit"
         disabled={busy || title.trim().length < 3 || description.trim().length < 5}
-        className="w-full rounded-xl bg-accent py-2.5 font-medium text-white hover:bg-accent-dark disabled:opacity-50"
+        className="min-h-11 w-full rounded-xl bg-accent py-3 font-medium text-white hover:bg-accent-dark disabled:opacity-50"
       >
         {busy ? "Raising…" : "Raise complaint"}
       </button>

@@ -14,8 +14,8 @@ export default async function NewComplaintPage() {
       session={session}
       flatLabel={memberships.map((m) => m.flat.code).join(" · ")}
     >
-      <h2 className="mb-4 text-lg font-semibold">Raise a complaint</h2>
       <div className="mx-auto max-w-xl">
+        <h2 className="mb-4 text-lg font-semibold">Raise a complaint</h2>
         <ComplaintForm flats={memberships.map((m) => m.flat)} />
       </div>
     </ResidentShell>

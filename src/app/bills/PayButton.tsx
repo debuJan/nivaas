@@ -55,7 +55,7 @@ export function PayButton({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="rounded-xl bg-accent px-4 py-2 text-sm font-medium text-white transition hover:bg-accent-dark"
+        className="min-h-11 rounded-xl bg-accent px-4 py-2.5 text-sm font-medium text-white transition hover:bg-accent-dark"
       >
         Pay {formatINR(dueAmount)}
       </button>
@@ -95,7 +95,7 @@ export function PayButton({
                     setOpen(false);
                     setReceipt(null);
                   }}
-                  className="mt-5 w-full rounded-xl bg-accent py-2.5 font-medium text-white hover:bg-accent-dark"
+                  className="mt-5 min-h-11 w-full rounded-xl bg-accent py-3 font-medium text-white hover:bg-accent-dark"
                 >
                   Done
                 </button>
@@ -130,7 +130,7 @@ export function PayButton({
                   <button
                     type="button"
                     onClick={() => setOpen(false)}
-                    className="flex-1 rounded-xl border border-stone-200 py-2.5 font-medium text-stone-600"
+                    className="min-h-11 flex-1 rounded-xl border border-stone-200 py-3 font-medium text-stone-600"
                   >
                     Cancel
                   </button>
@@ -138,7 +138,7 @@ export function PayButton({
                     type="button"
                     disabled={busy}
                     onClick={() => void pay()}
-                    className="flex-1 rounded-xl bg-accent py-2.5 font-medium text-white hover:bg-accent-dark disabled:opacity-50"
+                    className="min-h-11 flex-1 rounded-xl bg-accent py-3 font-medium text-white hover:bg-accent-dark disabled:opacity-50"
                   >
                     {busy ? "Processing…" : `Pay ${formatINR(dueAmount)}`}
                   </button>

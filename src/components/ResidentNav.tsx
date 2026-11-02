@@ -25,10 +25,14 @@ export function ResidentNav() {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex flex-col items-center gap-0.5 py-2 text-[11px] font-medium ${
+              aria-current={active ? "page" : undefined}
+              className={`relative flex min-h-12 flex-col items-center justify-center gap-0.5 py-2.5 text-[11px] font-medium ${
                 active ? "text-accent" : "text-stone-400"
               }`}
             >
+              {active && (
+                <span className="absolute inset-x-8 top-0 h-0.5 rounded-full bg-accent" />
+              )}
               <span className="text-base leading-none">{item.icon}</span>
               {item.label}
             </Link>

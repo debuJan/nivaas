@@ -3,7 +3,7 @@ import { prisma } from "@/lib/db";
 import { requirePageSession } from "@/lib/session";
 import { formatDate } from "@/lib/format";
 import { ResidentShell } from "@/components/ResidentShell";
-import { ComplaintStatusChip, UrgencyLabel } from "@/components/chips";
+import { ComplaintStatusChip, UrgencyChip } from "@/components/chips";
 
 export default async function ComplaintsPage() {
   const session = await requirePageSession("RESIDENT");
@@ -30,7 +30,7 @@ export default async function ComplaintsPage() {
         <h2 className="text-lg font-semibold">My complaints</h2>
         <Link
           href="/complaints/new"
-          className="rounded-xl bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent-dark"
+          className="inline-flex min-h-11 items-center rounded-xl bg-accent px-4 py-2.5 text-sm font-medium text-white hover:bg-accent-dark"
         >
           + New complaint
         </Link>
@@ -79,7 +79,7 @@ export default async function ComplaintsPage() {
                 </div>
                 <div className="flex shrink-0 flex-col items-end gap-1">
                   <ComplaintStatusChip status={c.status} />
-                  <UrgencyLabel urgency={c.urgency} />
+                  <UrgencyChip urgency={c.urgency} />
                 </div>
               </div>
               {c.photoUrl && (

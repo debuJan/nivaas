@@ -86,14 +86,14 @@ export default function LoginPage() {
                 onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))}
                 inputMode="numeric"
                 placeholder="10-digit mobile number"
-                className="mt-1.5 w-full rounded-xl border border-stone-300 px-3 py-2.5 text-base outline-none focus:border-accent focus:ring-2 focus:ring-teal-100"
+                className="mt-1.5 min-h-11 w-full rounded-xl border border-stone-300 px-3 py-3 text-base outline-none focus:border-accent focus:ring-2 focus:ring-teal-100"
               />
             </div>
             {error && <p className="text-sm text-rose-600">{error}</p>}
             <button
               type="submit"
               disabled={busy || phone.length !== 10}
-              className="w-full rounded-xl bg-accent py-2.5 font-medium text-white transition hover:bg-accent-dark disabled:opacity-50"
+              className="min-h-11 w-full rounded-xl bg-accent py-3 font-medium text-white transition hover:bg-accent-dark disabled:opacity-50"
             >
               {busy ? "Sending…" : "Send OTP"}
             </button>
@@ -123,14 +123,14 @@ export default function LoginPage() {
                 onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
                 inputMode="numeric"
                 placeholder="••••••"
-                className="mt-1.5 w-full rounded-xl border border-stone-300 px-3 py-2.5 text-center text-lg tracking-[0.4em] outline-none focus:border-accent focus:ring-2 focus:ring-teal-100"
+                className="mt-1.5 min-h-11 w-full rounded-xl border border-stone-300 px-3 py-3 text-center text-lg tracking-[0.4em] outline-none focus:border-accent focus:ring-2 focus:ring-teal-100"
               />
             </div>
             {error && <p className="text-sm text-rose-600">{error}</p>}
             <button
               type="submit"
               disabled={busy || code.length !== 6}
-              className="w-full rounded-xl bg-accent py-2.5 font-medium text-white transition hover:bg-accent-dark disabled:opacity-50"
+              className="min-h-11 w-full rounded-xl bg-accent py-3 font-medium text-white transition hover:bg-accent-dark disabled:opacity-50"
             >
               {busy ? "Verifying…" : "Verify & sign in"}
             </button>
@@ -151,7 +151,7 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={() => void requestOtp(d.phone)}
-                className="shrink-0 rounded-lg bg-white px-2 py-1 font-mono text-xs text-accent ring-1 ring-teal-200 transition hover:bg-teal-100"
+                className="min-h-11 shrink-0 rounded-lg bg-white px-3 py-1 font-mono text-xs text-accent ring-1 ring-teal-200 transition hover:bg-teal-100"
               >
                 {d.phone}
               </button>
