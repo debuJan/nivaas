@@ -79,6 +79,7 @@ const OCT_UNPAID = new Set(["T12-0408", "T03-0303", "T18-0402"]);
 async function main() {
   // Idempotent re-seed: wipe in FK-safe order.
   await prisma.payment.deleteMany();
+  await prisma.otpCode.deleteMany();
   await prisma.complaint.deleteMany();
   await prisma.bill.deleteMany();
   await prisma.membership.deleteMany();
@@ -100,8 +101,13 @@ async function main() {
   let phoneSeq = 9820011100;
   for (const spec of FLATS) {
     const tower = spec.code.split("-")[0];
+    // Payer UPI id for the resident, e.g. "swati.joshi@okhdfc" — the
+    // strongest everyday evidence the bank-matching engine gets.
+    const upiId =
+      spec.residentName.toLowerCase().replace(/[^a-z ]/g, "").trim()
+        .split(/\s+/).join(".") + "@okhdfc";
     const flat = await prisma.flat.create({
-      data: { code: spec.code, tower, areaSqft: spec.areaSqft, ownerName: spec.ownerName },
+      data: { code: spec.code, tower, areaSqft: spec.areaSqft, ownerName: spec.ownerName, upiId },
     });
     flatByCode.set(spec.code, flat);
 

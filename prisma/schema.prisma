@@ -82,6 +82,7 @@ model Flat {
   tower       String // "T07"
   areaSqft    Int
   ownerName   String
+  upiId       String? // resident's UPI id — evidence for bank matching
   memberships Membership[]
   bills       Bill[]
   payments    Payment[]
@@ -155,5 +156,16 @@ model Notice {
   id        String   @id @default(cuid())
   title     String
   body      String
+  createdAt DateTime @default(now())
+}
+
+// One live OTP per phone. Only the hash of the code is stored; the code
+// itself travels by (mock) SMS. attempts caps guessing at 5 per code.
+model OtpCode {
+  id        String   @id @default(cuid())
+  phone     String   @unique
+  codeHash  String
+  attempts  Int      @default(0)
+  expiresAt DateTime
   createdAt DateTime @default(now())
 }

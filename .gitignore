@@ -5,3 +5,5 @@ out
 dev.db
 dev.db-journal
 *.log
+public/uploads/*
+!public/uploads/.gitkeep
