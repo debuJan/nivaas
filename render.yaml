@@ -1,0 +1,32 @@
+# Nivaas — Render blueprint.
+#
+# One web service on the free plan. SQLite lives on a small persistent
+# disk so the ledger survives deploys and restarts.
+#
+# AFTER THE FIRST DEPLOY ONLY: open the service Shell in the Render
+# dashboard and run `npm run db:seed` once to load the demo data
+# (24 flats, bills, complaints, notices and the demo logins).
+# Do NOT add the seed to buildCommand — seeding on every boot would
+# duplicate/reset the data on each deploy.
+
+services:
+  - type: web
+    name: nivaas
+    runtime: node
+    plan: free
+    buildCommand: npm install && npx prisma db push && npm run build
+    startCommand: npm start
+    disk:
+      name: nivaas-data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      # The SQLite file lives on the persistent disk, not the ephemeral
+      # service filesystem.
+      - key: DATABASE_URL
+        value: file:/var/data/dev.db
+      # Signs the session cookies; Render generates a random value.
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: NODE_ENV
+        value: production
