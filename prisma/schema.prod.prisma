@@ -1,0 +1,172 @@
+// Nivaas — data model for a gated-township resident app.
+// Money is stored as whole rupees (Int) — society billing here is always
+// whole-rupee (rate x sqft, late fee rounded), which keeps matching exact.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  directUrl = env("DATABASE_URL_UNPOOLED")
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  RESIDENT
+  HELPDESK
+  COMMITTEE
+}
+
+enum MembershipType {
+  OWNER
+  TENANT
+  FAMILY
+}
+
+enum BillStatus {
+  UNPAID
+  PARTIALLY_PAID
+  PAID
+}
+
+enum PaymentSource {
+  ONLINE // paid in the app (test-mode gateway)
+  BANK_MATCH // posted from a bank-statement row by the matching engine
+  MANUAL // entered by the help desk / accounts
+}
+
+enum PaymentStatus {
+  POSTED // safely credited to a flat's bill
+  QUEUED // unclear — waiting in the accounts queue, never auto-posted
+  REJECTED
+}
+
+enum ComplaintCategory {
+  PLUMBING
+  ELECTRICAL
+  LIFT
+  CARPENTRY
+  HOUSEKEEPING
+  SECURITY
+  OTHER
+}
+
+enum ComplaintUrgency {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum ComplaintStatus {
+  OPEN
+  ASSIGNED
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+model User {
+  id          String       @id @default(cuid())
+  name        String
+  phone       String       @unique
+  role        Role         @default(RESIDENT)
+  memberships Membership[]
+  complaints  Complaint[]  @relation("RaisedBy")
+  createdAt   DateTime     @default(now())
+}
+
+model Flat {
+  id          String       @id @default(cuid())
+  code        String       @unique // "T07-1203"
+  tower       String // "T07"
+  areaSqft    Int
+  ownerName   String
+  upiId       String? // resident's UPI id — evidence for bank matching
+  memberships Membership[]
+  bills       Bill[]
+  payments    Payment[]
+  complaints  Complaint[]
+}
+
+model Membership {
+  id     String         @id @default(cuid())
+  user   User           @relation(fields: [userId], references: [id])
+  userId String
+  flat   Flat           @relation(fields: [flatId], references: [id])
+  flatId String
+  type   MembershipType
+
+  @@unique([userId, flatId])
+}
+
+model Bill {
+  id         String     @id @default(cuid())
+  flat       Flat       @relation(fields: [flatId], references: [id])
+  flatId     String
+  month      String // "2026-11"
+  baseAmount Int // rate x areaSqft
+  lateFee    Int        @default(0)
+  dueDate    DateTime
+  status     BillStatus @default(UNPAID)
+  paidAmount Int        @default(0)
+  payments   Payment[]
+
+  @@unique([flatId, month])
+}
+
+model Payment {
+  id         String        @id @default(cuid())
+  flat       Flat?         @relation(fields: [flatId], references: [id])
+  flatId     String?
+  bill       Bill?         @relation(fields: [billId], references: [id])
+  billId     String?
+  source     PaymentSource
+  amount     Int
+  reference  String // UTR / gateway txn id / cheque no.
+  payerUpiId String?
+  status     PaymentStatus @default(POSTED)
+  rawRow     Json? // original bank-statement row, kept for audit
+  createdAt  DateTime      @default(now())
+}
+
+model Complaint {
+  id            String            @id @default(cuid())
+  flat          Flat              @relation(fields: [flatId], references: [id])
+  flatId        String
+  raisedBy      User              @relation("RaisedBy", fields: [raisedById], references: [id])
+  raisedById    String
+  title         String
+  description   String
+  photoUrl      String?
+  category      ComplaintCategory
+  urgency       ComplaintUrgency
+  status        ComplaintStatus   @default(OPEN)
+  assignedTeam  String? // "Plumbing – Ramesh & team"
+  aiConfidence  Float? // classifier confidence at raise time (audit)
+  duplicateOf   Complaint?        @relation("Duplicates", fields: [duplicateOfId], references: [id])
+  duplicateOfId String?
+  duplicates    Complaint[]       @relation("Duplicates")
+  rating        Int? // 1..5, given by the resident on closure
+  createdAt     DateTime          @default(now())
+  resolvedAt    DateTime?
+}
+
+model Notice {
+  id        String   @id @default(cuid())
+  title     String
+  body      String
+  createdAt DateTime @default(now())
+}
+
+// One live OTP per phone. Only the hash of the code is stored; the code
+// itself travels by (mock) SMS. attempts caps guessing at 5 per code.
+model OtpCode {
+  id        String   @id @default(cuid())
+  phone     String   @unique
+  codeHash  String
+  attempts  Int      @default(0)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}

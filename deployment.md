@@ -35,32 +35,40 @@ To verify the code at any time: `npm test` (41 automated tests) and
 | Name | Purpose |
 | --- | --- |
 | `DATABASE_URL` | Where the database lives. Locally this is a SQLite file (`file:./dev.db`, already the default in `.env.example`); in production it points at the file on the persistent disk. Switching to Postgres later means changing this value and the Prisma provider — nothing else. |
-| `SESSION_SECRET` | Signs the httpOnly session cookie. Optional in local dev (the app falls back to a clearly-marked dev-only constant so a fresh clone runs with zero setup); **must** be set in production. On Render it is generated automatically by the blueprint. |
+| `SESSION_SECRET` | Signs the httpOnly session cookie. Optional in local dev (the app falls back to a clearly-marked dev-only constant so a fresh clone runs with zero setup); **must** be set in production (on Vercel, set once as a project environment variable).
 
 No other environment variables are used. The OTP sender and the payment
 gateway are mocked in this build (test mode, per the brief), so there
 are no SMS or payment-provider keys to configure.
 
-## Deployment (Render)
+## Deployment (Vercel + Neon Postgres)
 
-The repo ships a Render blueprint (`render.yaml`): one Node web service
-on the free plan, with a 1 GB persistent disk mounted at `/var/data`
-holding the SQLite file, so the ledger survives deploys and restarts.
+The live deployment runs on **Vercel** (the Next.js app) with a hosted
+**Postgres database from Neon**, connected through Vercel's Neon
+integration. Production uses Postgres rather than the local SQLite file
+because serverless filesystems are ephemeral — a file database would not
+survive between requests. The app code is identical in both worlds: the
+repo carries a second Prisma schema, `prisma/schema.prod.prisma`, with
+the same models and the provider switched to `postgresql`.
 
-1. In Render: **New → Blueprint**, connect this repository, **Apply**.
-   The build runs `npm install && npx prisma db push && npm run build`;
-   `DATABASE_URL` and a generated `SESSION_SECRET` come from the
-   blueprint.
-2. After the first deploy finishes, open the service **Shell** once and
-   run `npm run db:seed` to load the demo data. (Only once — seeding is
-   deliberately *not* part of the build, so redeploys never reset the
-   data.)
-3. The service URL Render assigns is the live app.
+1. **Import the repo** into Vercel (framework preset: Next.js).
+2. **Add the database:** in the project, *Storage → Create Database →
+   Neon*. The integration provisions the database and sets
+   `DATABASE_URL` (pooled) and `DATABASE_URL_UNPOOLED` (direct, used for
+   schema pushes) on the project automatically.
+3. **Set `SESSION_SECRET`** to any long random string in *Project
+   Settings → Environment Variables*.
+4. **Deploy.** The build command (pinned in `vercel.json`) runs, in
+   order: generate the Prisma client from the production schema →
+   `prisma db push` (create/update the tables) → `prisma db seed` →
+   `next build`. The seed wipes and recreates the demo dataset, so every
+   deploy starts from the same clean review state — deliberate for a
+   demo build; the matching and complaint engines are what is under
+   review, not data entry.
+5. The project's Vercel URL is the live app.
 
-**Honest note on the free plan:** the service sleeps after ~15 minutes
-without traffic, so the first request after a quiet period takes
-30–60 seconds to wake. It is fine for review; a paid instance removes
-the sleep.
+(The repo also ships a `render.yaml` blueprint as an alternative
+single-host deployment with the SQLite file on a persistent disk.)
 
 ## Demo logins
 
