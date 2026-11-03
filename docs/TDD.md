@@ -1,7 +1,7 @@
 # Nivaas — Technical Design Document
 
-**GitHub:** {{GITHUB_URL}}
-**Live app:** {{LIVE_URL}}
+**GitHub:** https://github.com/debuJan/nivaas
+**Live app:** https://nivaas-seven.vercel.app
 
 *Submitted by Debanshu Devgoswami. Everything labelled “Assumption” is my
 own call where the brief was silent, made so the build could proceed —

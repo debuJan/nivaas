@@ -41,10 +41,12 @@ No other environment variables are used. The OTP sender and the payment
 gateway are mocked in this build (test mode, per the brief), so there
 are no SMS or payment-provider keys to configure.
 
-## Deployment (Vercel + Neon Postgres)
+## Deployment (Vercel + Prisma Postgres)
+
+**Live app: <https://nivaas-seven.vercel.app>**
 
 The live deployment runs on **Vercel** (the Next.js app) with a hosted
-**Postgres database from Neon**, connected through Vercel's Neon
+**Prisma Postgres** database, connected through Vercel's Prisma Postgres
 integration. Production uses Postgres rather than the local SQLite file
 because serverless filesystems are ephemeral — a file database would not
 survive between requests. The app code is identical in both worlds: the
@@ -52,19 +54,22 @@ repo carries a second Prisma schema, `prisma/schema.prod.prisma`, with
 the same models and the provider switched to `postgresql`.
 
 1. **Import the repo** into Vercel (framework preset: Next.js).
-2. **Add the database:** in the project, *Storage → Create Database →
-   Neon*. The integration provisions the database and sets
-   `DATABASE_URL` (pooled) and `DATABASE_URL_UNPOOLED` (direct, used for
-   schema pushes) on the project automatically.
+2. **Add the database:** on the import screen (or later, *Storage →
+   Create Database*), add the **Prisma Postgres** integration (free
+   plan) and connect it to the project. The integration provisions the
+   database and sets `DATABASE_URL` on the project automatically. The
+   build script uses a separate unpooled URL for schema pushes when one
+   is provided (`DATABASE_URL_UNPOOLED`) and otherwise falls back to
+   `DATABASE_URL`.
 3. **Set `SESSION_SECRET`** to any long random string in *Project
    Settings → Environment Variables*.
-4. **Deploy.** The build command (pinned in `vercel.json`) runs, in
-   order: generate the Prisma client from the production schema →
-   `prisma db push` (create/update the tables) → `prisma db seed` →
-   `next build`. The seed wipes and recreates the demo dataset, so every
-   deploy starts from the same clean review state — deliberate for a
-   demo build; the matching and complaint engines are what is under
-   review, not data entry.
+4. **Deploy.** The build command (pinned in `vercel.json`) runs a small
+   script (`scripts/deploy-build.sh`): generate the Prisma client from
+   the production schema → `prisma db push` (create/update the tables)
+   → `prisma db seed` → `next build`. The seed wipes and recreates the
+   demo dataset, so every deploy starts from the same clean review
+   state — deliberate for a demo build; the matching and complaint
+   engines are what is under review, not data entry.
 5. The project's Vercel URL is the live app.
 
 (The repo also ships a `render.yaml` blueprint as an alternative
